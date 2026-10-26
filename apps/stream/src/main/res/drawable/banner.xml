@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="320dp" android:height="180dp"
+    android:viewportWidth="320" android:viewportHeight="180">
+    <path android:fillColor="#FF0B0F14" android:pathData="M0,0h320v180h-320z" />
+    <path android:strokeColor="#FF64B5F6" android:strokeWidth="8" android:pathData="M40,40h120v80h-120z" />
+    <path android:strokeColor="#FF64B5F6" android:strokeWidth="8" android:strokeLineCap="round" android:pathData="M75,142h50" />
+    <path android:fillColor="#FFF2F4F8" android:pathData="M88,60l32,20l-32,20z" />
+    <!-- seznam kanálů -->
+    <path android:fillColor="#FF26405E" android:pathData="M184,44h100v18h-100zM184,72h100v18h-100zM184,100h100v18h-100z" />
+    <path android:fillColor="#FF64B5F6" android:pathData="M184,72h100v18h-100z" />
+</vector>

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Banner pro TV launcher (320×180 dp): ukazatel + tři pruhy (RAM / CPU / úložiště). -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="320dp" android:height="180dp"
+    android:viewportWidth="320" android:viewportHeight="180">
+    <path android:fillColor="#FF0E1116" android:pathData="M0,0h320v180h-320z" />
+    <path android:fillColor="#FF1B212B" android:pathData="M0,150h320v30h-320z" />
+    <path android:strokeColor="#FF4FC3F7" android:strokeWidth="12" android:strokeLineCap="round"
+        android:pathData="M40,118 A48,48 0 1,1 136,118" />
+    <path android:strokeColor="#FFF2F4F8" android:strokeWidth="8" android:strokeLineCap="round"
+        android:pathData="M88,104 L112,70" />
+    <path android:fillColor="#FFF2F4F8" android:pathData="M88,104m-9,0a9,9 0 1,0 18,0a9,9 0 1,0 -18,0" />
+    <path android:fillColor="#FF2A313C" android:pathData="M164,52h120v14h-120z" />
+    <path android:fillColor="#FF66BB6A" android:pathData="M164,52h78v14h-78z" />
+    <path android:fillColor="#FF2A313C" android:pathData="M164,82h120v14h-120z" />
+    <path android:fillColor="#FFFFB74D" android:pathData="M164,82h46v14h-46z" />
+    <path android:fillColor="#FF2A313C" android:pathData="M164,112h120v14h-120z" />
+    <path android:fillColor="#FF4FC3F7" android:pathData="M164,112h96v14h-96z" />
+</vector>

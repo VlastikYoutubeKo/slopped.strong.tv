@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">TV Stream</string>
+    <color name="bg">#FF0B0D14</color>
+    <style name="Theme.Stream" parent="@android:style/Theme.DeviceDefault.NoActionBar">
+        <item name="android:windowBackground">@color/bg</item>
+        <item name="android:colorAccent">#FF8B5CF6</item>
+        <item name="android:textColor">#FFF8FAFC</item>
+    </style>
+</resources>

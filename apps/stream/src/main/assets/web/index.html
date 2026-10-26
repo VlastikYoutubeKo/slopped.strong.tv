@@ -1,0 +1,257 @@
+<!doctype html>
+<html lang="cs">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="dark">
+<title>TV Stream · nastavení</title>
+<style>
+  :root {
+    --bg: #0b0e13; --bg2: #141b26; --surface: #141a22; --surface-hi: #1e2631; --stroke: #26303d;
+    --accent: #5b8cff; --accent-press: #4a75d9; --accent-soft: rgba(91,140,255,.16);
+    --text: #f1f4f8; --text-2: #b4bfcc; --text-3: #7a8696; --ok: #4ed39a; --bad: #ff6b6b;
+    --r: 14px;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; background: linear-gradient(180deg, var(--bg2), var(--bg) 320px); background-color: var(--bg); color: var(--text);
+    font: 16px/1.45 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; -webkit-text-size-adjust: 100%; }
+  main { max-width: 640px; margin: 0 auto; padding: 20px 16px calc(32px + env(safe-area-inset-bottom)); }
+  header { display: flex; align-items: center; gap: 12px; margin: 8px 0 24px; }
+  header svg { flex: none; }
+  header h1 { margin: 0; font-size: 22px; font-weight: 600; }
+  header p { margin: 2px 0 0; color: var(--text-3); font-size: 14px; }
+  .overline { font-size: 12px; font-weight: 600; letter-spacing: .14em; text-transform: uppercase; color: var(--text-3); margin: 28px 0 10px; }
+  .card { background: var(--surface); border: 1px solid var(--stroke); border-radius: 18px; padding: 18px; }
+  .src { display: flex; align-items: center; gap: 14px; padding: 14px 16px; }
+  .src + .src { margin-top: 10px; }
+  .src .meta { flex: 1; min-width: 0; }
+  .src .name { font-weight: 600; font-size: 17px; }
+  .src .sub { color: var(--text-3); font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .badge { display: inline-block; font-size: 11px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase;
+    color: var(--accent); background: var(--accent-soft); border-radius: 6px; padding: 2px 7px; margin-right: 6px; vertical-align: 1px; }
+  .empty { color: var(--text-3); text-align: center; padding: 26px 10px; }
+  label { display: block; font-size: 13px; font-weight: 600; color: var(--text-2); margin: 16px 0 6px; }
+  .help { color: var(--text-3); font-size: 13px; margin-top: 6px; }
+  input { width: 100%; height: 50px; padding: 0 14px; font: inherit; font-size: 17px; color: var(--text);
+    background: var(--bg); border: 1px solid var(--stroke); border-radius: 12px; outline: none; }
+  input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
+  input::placeholder { color: var(--text-3); }
+  .row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  @media (max-width: 420px) { .row { grid-template-columns: 1fr; gap: 0; } }
+  .seg { display: grid; grid-template-columns: repeat(3, 1fr); background: var(--bg); border: 1px solid var(--stroke); border-radius: 12px; padding: 4px; }
+  .seg button { height: 42px; border: 0; border-radius: 9px; background: none; color: var(--text-2); font: inherit; font-weight: 600; cursor: pointer; }
+  .seg button[aria-pressed="true"] { background: var(--accent); color: #fff; }
+  .pw { position: relative; }
+  .pw input { padding-right: 76px; }
+  .pw button { position: absolute; right: 6px; top: 6px; height: 38px; padding: 0 12px; border: 0; border-radius: 9px;
+    background: var(--surface-hi); color: var(--text-2); font: inherit; font-size: 14px; cursor: pointer; }
+  .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; height: 50px; padding: 0 20px; border-radius: 12px;
+    border: 1px solid var(--stroke); background: var(--surface-hi); color: var(--text); font: inherit; font-weight: 600; cursor: pointer; }
+  .btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .btn.primary:active { background: var(--accent-press); }
+  .btn.small { height: 40px; padding: 0 14px; font-size: 14px; }
+  .btn.danger { color: var(--bad); }
+  .btn:disabled { opacity: .55; cursor: default; }
+  .actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 22px; }
+  .actions .btn.primary { flex: 1 1 220px; }
+  .status { display: none; gap: 12px; align-items: flex-start; margin-top: 18px; padding: 14px 16px; border-radius: var(--r); border: 1px solid; }
+  .status.show { display: flex; }
+  .status.info { background: var(--accent-soft); border-color: rgba(91,140,255,.4); }
+  .status.ok { background: rgba(78,211,154,.12); border-color: rgba(78,211,154,.4); }
+  .status.err { background: rgba(255,107,107,.12); border-color: rgba(255,107,107,.4); }
+  .status b { display: block; }
+  .status span { color: var(--text-2); font-size: 14px; }
+  .spin { flex: none; width: 22px; height: 22px; border: 3px solid rgba(255,255,255,.2); border-top-color: var(--accent); border-radius: 50%; animation: s .8s linear infinite; }
+  .mark { flex: none; width: 22px; text-align: center; font-weight: 700; }
+  @keyframes s { to { transform: rotate(360deg); } }
+  #gate .pin { letter-spacing: .4em; text-align: center; font-size: 26px; font-variant-numeric: tabular-nums; }
+  .hidden { display: none !important; }
+  footer { color: var(--text-3); font-size: 13px; margin-top: 30px; text-align: center; }
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <svg width="40" height="40" viewBox="0 0 24 24" aria-hidden="true"><rect x="1" y="3" width="22" height="16" rx="3" fill="none" stroke="#5b8cff" stroke-width="2"/><path d="M8 22h8" stroke="#5b8cff" stroke-width="2" stroke-linecap="round"/><path d="M10 8l5 3-5 3z" fill="#f1f4f8"/></svg>
+    <div><h1>TV Stream</h1><p>Nastavení zdrojů z telefonu</p></div>
+  </header>
+
+  <!-- PIN z obrazovky televize (z QR kódu se doplní sám) -->
+  <section id="gate" class="card hidden">
+    <b>Zadej PIN z televize</b>
+    <p class="help" style="margin-top:4px">Šestimístné číslo je na obrazovce „Nastavit z telefonu“.</p>
+    <input id="pin" class="pin" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="••••••">
+    <div class="actions"><button class="btn primary" id="pinGo">Pokračovat</button></div>
+    <div class="status" id="pinStatus"></div>
+  </section>
+
+  <section id="app" class="hidden">
+    <div class="overline">Zdroje na televizi</div>
+    <div id="list"></div>
+
+    <div class="overline" id="formTitle">Přidat zdroj</div>
+    <form class="card" id="form" autocomplete="off">
+      <input type="hidden" id="id">
+      <div class="seg" role="group" aria-label="Typ serveru">
+        <button type="button" data-type="XTREAM" aria-pressed="true">Xtream Codes</button>
+        <button type="button" data-type="TVHEADEND" aria-pressed="false">TVHeadend</button>
+        <button type="button" data-type="STALKER" aria-pressed="false">Stalker</button>
+      </div>
+
+      <label for="url">Adresa serveru</label>
+      <input id="url" inputmode="url" autocapitalize="off" spellcheck="false" placeholder="http://server.cz:8080">
+      <div class="help hidden" id="httpNote" style="color:#e9b44c">Nešifrované spojení (HTTP): přihlašovací údaje půjdou sítí čitelně. Pokud server umí HTTPS, použij ho.</div>
+      <div class="help" id="urlHelp">Stačí adresa serveru. Můžeš sem vložit i celý M3U odkaz, jméno a heslo se z něj doplní.</div>
+
+      <div class="row" id="credRow">
+        <div><label for="user" id="userLabel">Uživatelské jméno</label><input id="user" autocapitalize="off" spellcheck="false"><button type="button" class="btn small hidden" id="genMac" style="margin-top:8px">Vygenerovat MAC</button></div>
+        <div id="passWrap"><label for="pass">Heslo</label>
+          <div class="pw"><input id="pass" type="password" autocapitalize="off" spellcheck="false"><button type="button" id="pwShow">Ukázat</button></div>
+        </div>
+      </div>
+
+      <label for="name">Název v seznamu <span style="color:var(--text-3);font-weight:400">(nepovinné)</span></label>
+      <input id="name" placeholder="např. Domácí TVH">
+
+      <div class="actions">
+        <button class="btn primary" id="save" type="submit">Otestovat a uložit</button>
+        <button class="btn" id="saveRaw" type="button">Uložit bez testu</button>
+        <button class="btn hidden" id="cancel" type="button">Zrušit úpravy</button>
+      </div>
+      <div class="status" id="status"></div>
+    </form>
+    <footer>Změny se na televizi projeví hned. Hesla se do prohlížeče nikdy neposílají zpět.</footer>
+  </section>
+</main>
+
+<script>
+(() => {
+  const $ = (s) => document.querySelector(s);
+  let pin = (location.hash.match(/\d{6}/) || [])[0] || sessionStorage.getItem('pin') || '';
+  let type = 'XTREAM', sources = [];
+
+  async function api(method, path, body) {
+    const r = await fetch(path, { method, headers: { 'X-Pin': pin, 'Content-Type': 'application/json' }, body: body ? JSON.stringify(body) : undefined });
+    const data = await r.json().catch(() => ({}));
+    if (r.status === 401) throw Object.assign(new Error(data.error || 'Špatný PIN'), { pin: true });
+    return data;
+  }
+  function status(el, kind, title, text) {
+    el.className = 'status show ' + kind;
+    el.innerHTML = (kind === 'info' ? '<div class="spin"></div>' : `<div class="mark" style="color:var(--${kind === 'ok' ? 'ok' : 'bad'})">${kind === 'ok' ? '✓' : '!'}</div>`) +
+      '<div><b></b><span></span></div>';
+    el.querySelector('b').textContent = title;
+    el.querySelector('span').textContent = text || '';
+  }
+  const fmt = (n) => n.toLocaleString('cs-CZ');
+
+  // ---- PIN
+  async function unlock() {
+    try {
+      sources = await api('GET', '/api/sources');
+      sessionStorage.setItem('pin', pin);
+      history.replaceState(null, '', location.pathname); // PIN nenechávat v adrese
+      $('#gate').classList.add('hidden'); $('#app').classList.remove('hidden');
+      render();
+    } catch (e) {
+      $('#gate').classList.remove('hidden'); $('#app').classList.add('hidden');
+      if (pin) status($('#pinStatus'), 'err', e.pin ? 'Špatný PIN' : 'Televize neodpovídá', e.pin ? 'Opiš ho znovu z obrazovky televize.' : 'Je na TV otevřená obrazovka „Nastavit z telefonu“?');
+      $('#pin').focus();
+    }
+  }
+  $('#pinGo').onclick = () => { pin = $('#pin').value.trim(); unlock(); };
+  $('#pin').onkeydown = (e) => { if (e.key === 'Enter') $('#pinGo').click(); };
+
+  // ---- seznam
+  function render() {
+    const list = $('#list');
+    list.innerHTML = '';
+    if (!sources.length) { list.innerHTML = '<div class="card empty">Zatím žádný zdroj. Přidej první níže.</div>'; return; }
+    for (const s of sources) {
+      const el = document.createElement('div');
+      el.className = 'card src';
+      el.innerHTML = '<div class="meta"><div class="name"></div><div class="sub"><span class="badge"></span><span class="u"></span></div></div>' +
+        '<button class="btn small" data-a="edit">Upravit</button><button class="btn small danger" data-a="del">Smazat</button>';
+      el.querySelector('.name').textContent = s.name;
+      el.querySelector('.badge').textContent = s.type === 'XTREAM' ? 'Xtream' : s.type === 'STALKER' ? 'Stalker' : 'TVH';
+      el.querySelector('.u').textContent = s.url.replace(/^https?:\/\//, '') + (s.user ? ' · ' + s.user : '');
+      el.querySelector('[data-a=edit]').onclick = () => edit(s);
+      el.querySelector('[data-a=del]').onclick = async () => {
+        if (!confirm(`Smazat zdroj „${s.name}“ z televize?`)) return;
+        await api('DELETE', '/api/sources?id=' + encodeURIComponent(s.id));
+        sources = await api('GET', '/api/sources'); render(); if ($('#id').value === s.id) reset();
+      };
+      list.appendChild(el);
+    }
+  }
+
+  // ---- formulář
+  function setType(t) {
+    type = t;
+    document.querySelectorAll('.seg button').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.type === t)));
+    $('#url').placeholder = t === 'XTREAM' ? 'http://server.cz:8080' : t === 'STALKER' ? 'http://portal.cz/c/' : 'http://192.168.1.10:9981';
+    $('#urlHelp').textContent = t === 'XTREAM'
+      ? 'Stačí adresa serveru. Můžeš sem vložit i celý M3U odkaz, jméno a heslo se z něj doplní.'
+      : t === 'STALKER' ? 'Adresa portálu, obvykle končí /c/. Zařízení se představí MAC adresou níže.'
+      : 'Webové rozhraní TVHeadendu, výchozí port 9981. Uživatel musí mít povolené streamování.';
+    $('#userLabel').textContent = t === 'STALKER' ? 'MAC adresa zařízení' : 'Uživatelské jméno';
+    $('#user').placeholder = t === 'STALKER' ? '00:1A:79:xx:xx:xx' : '';
+    $('#passWrap').classList.toggle('hidden', t === 'STALKER');
+    $('#genMac').classList.toggle('hidden', t !== 'STALKER');
+    httpNote();
+  }
+  document.querySelectorAll('.seg button').forEach((b) => (b.onclick = () => setType(b.dataset.type)));
+  // Upozornění na nešifrované spojení (HTTP): údaje by šly sítí čitelně.
+  function httpNote() {
+    const v = $('#url').value.trim();
+    $('#httpNote').classList.toggle('hidden', !(/^http:\/\//i.test(v) || (v && !/^https?:/i.test(v))));
+  }
+  $('#url').addEventListener('input', httpNote);
+  $('#genMac').onclick = () => { const h = () => Math.floor(Math.random() * 256).toString(16).toUpperCase().padStart(2, '0'); $('#user').value = '00:1A:79:' + [h(), h(), h()].join(':'); };
+  $('#pwShow').onclick = () => { const p = $('#pass'); p.type = p.type === 'password' ? 'text' : 'password'; $('#pwShow').textContent = p.type === 'password' ? 'Ukázat' : 'Skrýt'; };
+  // vložený M3U odkaz rozebrat hned
+  $('#url').addEventListener('input', () => {
+    const v = $('#url').value;
+    if (!/username=/.test(v)) return;
+    try {
+      const u = new URL(/^https?:/.test(v) ? v : 'http://' + v);
+      if (u.searchParams.get('username')) { $('#user').value = u.searchParams.get('username'); $('#pass').value = u.searchParams.get('password') || ''; $('#url').value = u.origin; setType('XTREAM'); }
+    } catch {}
+  });
+
+  function edit(s) {
+    $('#id').value = s.id; setType(s.type);
+    $('#url').value = s.url; $('#user').value = s.user; $('#name').value = s.name; $('#pass').value = '';
+    $('#pass').placeholder = s.hasPassword ? 'uložené, nech prázdné' : '';
+    $('#formTitle').textContent = 'Upravit zdroj'; $('#cancel').classList.remove('hidden');
+    $('#status').className = 'status';
+    $('#form').scrollIntoView({ behavior: 'smooth' });
+  }
+  function reset() {
+    $('#form').reset(); $('#id').value = ''; $('#pass').placeholder = ''; setType('XTREAM');
+    $('#formTitle').textContent = 'Přidat zdroj'; $('#cancel').classList.add('hidden');
+  }
+  $('#cancel').onclick = () => { reset(); $('#status').className = 'status'; };
+
+  async function save(test) {
+    const body = { id: $('#id').value, type, url: $('#url').value.trim(), user: $('#user').value.trim(), pass: $('#pass').value, name: $('#name').value.trim(), test };
+    const btns = [$('#save'), $('#saveRaw')]; btns.forEach((b) => (b.disabled = true));
+    status($('#status'), 'info', test ? 'Zkouším připojení…' : 'Ukládám…', test ? 'Televize se přihlásí a načte kanály. U velkých playlistů to trvá až 2 minuty.' : '');
+    try {
+      const r = await api('POST', '/api/sources', body);
+      if (r.ok) {
+        status($('#status'), 'ok', 'Uloženo na televizi', r.channels != null ? `${fmt(r.channels)} kanálů · ${fmt(r.categories)} skupin` : 'Bez testu připojení.');
+        sources = await api('GET', '/api/sources'); render(); reset();
+      } else status($('#status'), 'err', 'Nepodařilo se připojit', r.error);
+    } catch (e) {
+      status($('#status'), 'err', e.pin ? 'Špatný PIN' : 'Spojení s televizí se přerušilo', e.pin ? 'Otevři stránku znovu přes QR kód.' : 'Je obrazovka „Nastavit z telefonu“ na TV pořád otevřená?');
+    } finally { btns.forEach((b) => (b.disabled = false)); }
+  }
+  $('#form').onsubmit = (e) => { e.preventDefault(); save(true); };
+  $('#saveRaw').onclick = () => save(false);
+
+  unlock();
+})();
+</script>
+</body>
+</html>

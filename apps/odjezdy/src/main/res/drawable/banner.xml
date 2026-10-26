@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 320×180: LED tabule – tři řádky odjezdů z „teček“. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="320dp" android:height="180dp"
+    android:viewportWidth="320" android:viewportHeight="180">
+    <path android:fillColor="#FF0A0600" android:pathData="M0,0h320v180h-320z" />
+    <path android:strokeColor="#FF5A3400" android:strokeWidth="2" android:pathData="M20,52h280M20,150h280" />
+    <!-- nadpis -->
+    <path android:fillColor="#FFFF9A00" android:pathData="M20,18h110v24h-110z" />
+    <path android:fillColor="#FFFF9A00" android:pathData="M230,18h70v24h-70z" />
+    <!-- řádky: linka, cíl, minuty -->
+    <path android:fillColor="#FFFF9A00" android:pathData="M20,66h24v16h-24zM54,66h150v16h-150zM262,66h38v16h-38z" />
+    <path android:fillColor="#FFFF9A00" android:pathData="M20,94h24v16h-24zM54,94h120v16h-120zM262,94h38v16h-38z" />
+    <path android:fillColor="#FFFF9A00" android:pathData="M20,122h24v16h-24zM54,122h170v16h-170zM262,122h38v16h-38z" />
+    <path android:fillColor="#FF0A0600" android:pathData="M20,18h280v4h-280zM20,26h280v2h-280zM20,32h280v2h-280zM20,38h280v2h-280zM20,70h280v2h-280zM20,76h280v2h-280zM20,98h280v2h-280zM20,104h280v2h-280zM20,126h280v2h-280zM20,132h280v2h-280z" />
+</vector>

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Výrazný stav fokusu, aby bylo z gauče vidět, kde je kurzor. -->
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:state_focused="true">
+        <shape>
+            <solid android:color="@color/card_focus" />
+            <stroke android:width="4dp" android:color="@color/accent" />
+            <corners android:radius="16dp" />
+        </shape>
+    </item>
+    <item android:state_pressed="true">
+        <shape>
+            <solid android:color="@color/accent" />
+            <corners android:radius="16dp" />
+        </shape>
+    </item>
+    <item>
+        <shape>
+            <solid android:color="@color/card" />
+            <stroke android:width="2dp" android:color="#FF2A313C" />
+            <corners android:radius="16dp" />
+        </shape>
+    </item>
+</selector>

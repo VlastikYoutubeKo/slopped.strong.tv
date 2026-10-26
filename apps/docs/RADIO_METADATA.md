@@ -1,0 +1,11 @@
+# Rádio, metadata a vizualizér
+
+**Režim zvuk/video** (`Playback`): nikdy podle přípony. Po `onTracksChanged`: je-li video stopa, je to video. Bez videa se počká (rádio 0,7 s, televize 2,5 s – video stopa se někdy objeví později), pak je to zvuk. Pozdní video (`onVideoSizeChanged`) přepne zpět bez restartu streamu. Ručně: Možnosti → „Jen zvuk“ / „Zobrazit video“. Rádio vrstva se ukáže hned u stanic zařazených jako rádio, takže nikdy není prázdná černá obrazovka. Zařazení: `Classify` (konzervativní, ručně opravitelné).
+**Typ proudu**: adresa `.m3u8`, která je ve skutečnosti MP3/AAC (nebo naopak), se po chybě rozboru zkusí s vynuceným typem.
+
+**Metadata** → jednotný model `NowPlaying` (stanice, skladba, interpret, album, obal, pořad, zdroj metadat, čas). Zdroje: ICY (`StreamTitle`, požadavek `Icy-MetaData: 1`), ID3 v HLS/MP3 (TIT2/TPE1/TALB), pořad z EPG (nikdy nepřepíše skladbu). Rozbor `IcyParser` dělí jen na prvním `␠-␠` (Jay-Z se nedělí), nerozpozná jako skladbu jméno stanice, odkaz ani reklamu/jingl, opraví zkomolené UTF-8. Skladba, která měla dávno skončit, se neukazuje. Bez metadat UI ukáže „Právě posloucháte“ + název stanice.
+**Obal alba**: jen z metadat, nebo volitelně iTunes Search (Nastavení → vypnuto, odesílá interpreta a název třetí straně; výsledek musí odpovídat – `CoverMatch`).
+**Nepodporováno**: vlastní externí endpoint metadat (model `Origin.CUSTOM` je připraven, endpoint ne).
+
+**Vizualizér**: `AudioTap` kopíruje PCM z `TeeAudioProcessor` do kruhového bufferu; `Analyzer` (vlákno na pozadí) dělá FFT 1024 (Hann), 48 pásem, rychlý nástup a pomalý pokles. Při passthrough (AC3…) data nejsou → ambientní animace, v diagnostice označená „bez analýzy“. Režimy orb / spektrum / vlna / vypnuto; kvalita auto/vysoká/vyvážená/nízká/vypnuto (`QualityGovernor` snižuje podle skutečné doby kreslení); fps auto/15/24/30/60. Ochrana obrazovky: po 90 s ztlumení, jednou za minutu jemný posun obsahu.
+**Pozadí**: po Zpět rádio hraje dál (volitelné). Není to pravá služba na popředí s MediaSession – systém může proces ukončit.

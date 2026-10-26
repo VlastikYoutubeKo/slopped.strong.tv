@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">TV Nástroje</string>
+    <string name="section_system">Systém</string>
+    <string name="section_actions">Akce</string>
+    <string name="section_settings">Rychlé nastavení</string>
+    <string name="free_ram">Spořič obrazovky</string>
+    <string name="animations">Animace</string>
+    <string name="apps">Aplikace</string>
+    <string name="set_storage">Úložiště</string>
+    <string name="set_apps">Správa aplikací</string>
+    <string name="set_network">Síť a Wi‑Fi</string>
+    <string name="set_dev">Pro vývojáře</string>
+    <string name="set_home">Launcher</string>
+    <string name="set_all">Nastavení</string>
+    <string name="apps_title">Aplikace – OK spustí, tlačítko Info otevře detail (vynutit ukončení, vymazat mezipaměť)</string>
+    <string name="launch">Spustit</string>
+    <string name="info">Info</string>
+    <string name="hint">D‑pad: pohyb · OK: potvrdit · Zpět: návrat</string>
+</resources>

@@ -1,0 +1,9 @@
+.gradle/
+build/
+local.properties
+*.apk
+*.png
+!docs/screenshots/*.png
+!stream/src/main/**/*.png
+!docs/screenshots/*.png
+.idea/
