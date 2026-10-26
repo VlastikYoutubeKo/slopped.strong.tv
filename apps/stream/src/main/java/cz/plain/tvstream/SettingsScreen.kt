@@ -34,6 +34,9 @@ class SettingsScreen(act: MainActivity) : Screen(act) {
                 MenuEntry(n, if (i == Settings.accentIndex) R.drawable.ic_check else 0, selected = i == Settings.accentIndex) { Settings.accentIndex = i; Design.apply(c); c.recreate() }
             })
         }
+        row("Velikost rozhraní", "Výchozí je menší než dřív; Velké vrací původní velikost.", { scaleName(Settings.uiScale) }) {
+            c.showMenu("Velikost rozhraní", null, listOf(0.7f, 0.8f, 1.0f).map { s -> MenuEntry(scaleName(s), if (Settings.uiScale == s) R.drawable.ic_check else 0, selected = Settings.uiScale == s) { Settings.uiScale = s; c.recreate() } })
+        }
         toggle("Snížený pohyb", "Bez zvětšování při fokusu a bez animací. Vizualizér se zastaví.", { Settings.reducedMotion }) { Settings.reducedMotion = it; Design.apply(c) }
         toggle("Vysoký kontrast", "Silnější obrysy a méně průhledné povrchy.", { Settings.highContrast }) { Settings.highContrast = it; Design.apply(c); c.recreate() }
         toggle("Pozadí s jemnými záblesky", null, { Settings.ambient }) { Settings.ambient = it; Design.apply(c); c.recreate() }
@@ -108,6 +111,7 @@ class SettingsScreen(act: MainActivity) : Screen(act) {
         return valueView
     }
 
+    private fun scaleName(s: Float) = when { s <= 0.7f -> "Malé"; s < 1f -> "Střední"; else -> "Velké" }
     private fun vizName(id: String) = when (id) { "orb" -> "Zářící koule"; "bars" -> "Spektrum"; "wave" -> "Vlna"; else -> "Vypnuto" }
     private fun qualityName(id: String) = when (id) { "high" -> "Vysoká"; "balanced" -> "Vyvážená"; "low" -> "Nízká"; "off" -> "Vypnuto"; else -> "Automaticky" }
     private fun aspectName(id: String) = when (id) { "fill" -> "Vyplnit"; "zoom" -> "Přiblížit"; else -> "Přizpůsobit" }

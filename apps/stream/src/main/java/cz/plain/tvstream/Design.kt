@@ -34,7 +34,7 @@ object Design {
     // ---------------------------------------------------------------- tokeny
     val BG = 0xFF0B0D14.toInt()
     val ELEVATED = 0xFF101420.toInt()
-    val SURFACE = argb(0.30f, 22, 26, 38)
+    val SURFACE = argb(0.16f, 22, 26, 38)
     /** Nepropustný povrch pro velké textové plochy (průhlednost zhoršuje čitelnost). */
     val SURFACE_SOLID = 0xFF141826.toInt()
     val FOCUS_SURFACE = argb(0.60f, 38, 44, 64)
@@ -166,6 +166,17 @@ object Design {
     }
 }
 
+/** Velikost rozhraní: obalí kontext se změněnou hustotou, takže dp i sp se zmenší (nebo zvětší) všude stejně. */
+object UiScale {
+    fun wrap(base: Context): Context {
+        val s = try { base.getSharedPreferences("settings", Context.MODE_PRIVATE).getFloat("uiScale", Settings.DEFAULT_SCALE) } catch (_: Exception) { Settings.DEFAULT_SCALE }
+        if (s == 1f) return base
+        val c = android.content.res.Configuration(base.resources.configuration)
+        c.densityDpi = (c.densityDpi * s).toInt().coerceAtLeast(120)
+        return base.createConfigurationContext(c)
+    }
+}
+
 /**
  * Typografická škála (sp). Výjimky: texty vykreslené přímo na Canvas v časové ose EPG a monogramy log
  * (velikost se odvozuje od velikosti dlaždice).
@@ -233,22 +244,21 @@ class GlassDrawable(ctx: Context, radiusDp: Float, private val solid: Boolean) :
         fill.color = when {
             // Nepropustná plocha: stín fokusu (záře) jinak prosvítá průhlednou výplní a kreslí uvnitř prvku tmavý pruh.
             focused -> Design.blend(0xFF1E2438.toInt(), accent, 0.14f)
-            active -> Design.blend(base, accent, 0.22f)
+            active -> Design.blend(base, accent, 0.20f)
             else -> base
         }
-        val stroke = when { focused -> 2f * density; active -> 1.2f * density; else -> density }
+        // Minimalisticky: v klidu bez obrysu, rámeček jen u zaostřeného prvku (a ve vysokém kontrastu).
+        val stroke = when { focused -> 2f * density; hc -> density; else -> 0f }
         line.strokeWidth = stroke
         line.color = when {
             focused -> accent
-            active -> Design.withAlpha(accent, 0.6f)
             hc -> Design.withAlpha(Color.WHITE, 0.35f)
-            else -> Design.HAIRLINE
+            else -> Color.TRANSPARENT
         }
         val half = stroke / 2f
         rect.set(bounds.left + half, bounds.top + half, bounds.right - half, bounds.bottom - half)
         c.drawRoundRect(rect, r, r, fill)
-        if (!hc) c.drawRoundRect(rect, r, r, gloss)
-        c.drawRoundRect(rect, r, r, line)
+        if (stroke > 0f) c.drawRoundRect(rect, r, r, line)
     }
 
     override fun setAlpha(alpha: Int) { fill.alpha = alpha }

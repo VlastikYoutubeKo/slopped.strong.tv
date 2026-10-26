@@ -27,7 +27,7 @@ fun Context.chip(text: String, icon: Int = 0, onClick: () -> Unit): TextView = l
     setPadding(dp(14), 0, dp(Sp.L), 0)
     compoundDrawablePadding = dp(Sp.S)
     background = Design.glass(this@chip, Design.R_CTRL)
-    if (icon != 0) { setCompoundDrawablesRelativeWithIntrinsicBounds(icon, 0, 0, 0); compoundDrawableTintList = android.content.res.ColorStateList.valueOf(Design.TEXT2) }
+    // Minimalisticky bez ikon: čip je text.
     Design.focusable(this, Design.R_CTRL, Design.SCALE_CHIP)
     setOnClickListener { onClick() }
 }
@@ -116,7 +116,7 @@ class LiveScreen(act: MainActivity, private val kind: ChannelKind) : Screen(act)
         bodyRef = body
         col.addView(timeline.view, LinearLayout.LayoutParams(MATCH_PARENT, 0, 1f))
 
-        val railBox = LinearLayout(c).apply { orientation = LinearLayout.VERTICAL; background = Design.glass(c, Design.R_LG, solid = true); setPadding(c.dp(Sp.S), c.dp(14), c.dp(Sp.S), c.dp(Sp.S)); clipChildren = true; clipToPadding = false }
+        val railBox = LinearLayout(c).apply { orientation = LinearLayout.VERTICAL; setPadding(c.dp(Sp.S), c.dp(Sp.S), c.dp(Sp.S), c.dp(Sp.S)); clipChildren = true; clipToPadding = false }
         railBox.addView(c.caption("Skupiny").apply { setPadding(c.dp(Sp.M), 0, 0, c.dp(Sp.S)) })
         railList.layoutManager = FocusLayoutManager(c, LinearLayoutManager.VERTICAL, 0.4f)
         railList.adapter = railAdapter; railList.itemAnimator = null; railList.overScrollMode = View.OVER_SCROLL_NEVER
@@ -139,8 +139,8 @@ class LiveScreen(act: MainActivity, private val kind: ChannelKind) : Screen(act)
         body.addView(detail.view, LinearLayout.LayoutParams(c.dp(252), MATCH_PARENT))
 
         // nápověda ovládání (jemná, bez velkých tlačítek)
-        col.addView(hintsCompact, LinearLayout.LayoutParams(MATCH_PARENT, WRAP_CONTENT).apply { setMargins(c.dp(Sp.XXXL), c.dp(10), c.dp(Sp.XXXL), c.dp(18)) })
-        col.addView(hintsTimeline, LinearLayout.LayoutParams(MATCH_PARENT, WRAP_CONTENT).apply { setMargins(c.dp(Sp.XXXL), c.dp(10), c.dp(Sp.XXXL), c.dp(18)) })
+        // Nápověda ovládání se záměrně nezobrazuje: rozhraní je minimalistické a ovládání je pro D-pad samozřejmé.
+        col.addView(hintsCompact.apply { visibility = View.GONE }); col.addView(hintsTimeline.apply { visibility = View.GONE })
         updateChips()
         applyMode()
     }
@@ -148,8 +148,6 @@ class LiveScreen(act: MainActivity, private val kind: ChannelKind) : Screen(act)
     private fun applyMode() {
         val tl = mode == "timeline"
         bodyRef.visibility = if (tl) View.GONE else View.VISIBLE
-        hintsCompact.visibility = if (tl) View.GONE else View.VISIBLE
-        hintsTimeline.visibility = if (tl) View.VISIBLE else View.GONE
         modeChip.visibility = if (isRadio) View.GONE else View.VISIBLE
         timeline.view.visibility = if (tl) View.VISIBLE else View.GONE
         updateChips()
@@ -385,7 +383,7 @@ class LiveScreen(act: MainActivity, private val kind: ChannelKind) : Screen(act)
 
     // ---------------------------------------------------------------- řádek kanálu
 
-    private inner class ChannelRow(val c: Context) : ListRow(c, heightDp = 72) {
+    private inner class ChannelRow(val c: Context) : ListRow(c, heightDp = 60) {
         private val number = c.label(Typo.SMALL, Design.MUTED, 500, mono = true).apply { gravity = Gravity.END }
         private val logo = LogoTile(c, 13f)
         private val fav = c.icon(R.drawable.ic_star, 16, Design.accent)
@@ -451,7 +449,7 @@ class LiveScreen(act: MainActivity, private val kind: ChannelKind) : Screen(act)
 
         val view = LinearLayout(c).apply {
             orientation = LinearLayout.VERTICAL
-            background = Design.glass(c, Design.R_LG, solid = true)
+            background = Design.glass(c, Design.R_LG)
             setPadding(c.dp(22), c.dp(20), c.dp(22), c.dp(14))
             addView(logo, LinearLayout.LayoutParams(c.dp(104), c.dp(62)))
             addView(name, LinearLayout.LayoutParams(MATCH_PARENT, WRAP_CONTENT).apply { topMargin = c.dp(Sp.M) })

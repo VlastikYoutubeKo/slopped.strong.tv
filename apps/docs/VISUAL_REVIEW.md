@@ -32,14 +32,14 @@ Závažnost: **C**ritical (nepoužitelné / nefunkční) · **M**ajor (zřejmě 
 | M | Časová osa: datum se překrývalo s popiskem první půlhodiny, čas přetékal do pásu s mřížkou | datum má vlastní řádek, popisky půlhodin pod ním | [před](screenshots/1080_live_timeline_before.png) → [po](screenshots/1080_live_timeline_focus.png) |
 | M | Rádio mělo přepínač „Časová osa“ a zobrazilo prázdnou časovou osu | časová osa jen pro televizi; rádio vždy kompaktně | [před](screenshots/1080_radio_timeline-bug_before.png) → [po](screenshots/1080_radio_compact.png) |
 | M | Radio přehrávač: čtvercový obal mimo střed orbu, paprsky přesahovaly do textu | kruhový obal přesně uprostřed orbu (střed se bere ze skutečné polohy), paprsky kratší, mezera před textem | [před](screenshots/1080_radio_player_orb_before.png) → [po](screenshots/1080_radio_player_orb.png) |
-| M | Seriál: dlouhý popis zabral 7 řádků a epizody vyjely z obrazovky | popis max. 3 řádky, epizody vidět hned | po |
-| M | Chyba sítě ve zdroji ukazovala `unexpected end of stream on http://…` včetně adresy | srozumitelná věta + `Redact.url` na všech chybových textech (test) | po |
+| M | Seriál: dlouhý popis zabral 7 řádků a epizody vyjely z obrazovky | popis max. 3 řádky, epizody vidět hned | [po](screenshots/1080_series_episodes.png) |
+| M | Chyba sítě ve zdroji ukazovala `unexpected end of stream on http://…` včetně adresy | srozumitelná věta + `Redact.url` na všech chybových textech (test) | [po](screenshots/1080_sources_error.png) |
 | I | Po návratu z přehrávače skočil fokus na horní lištu | hlavní okno si pamatuje zaostřený prvek a po návratu ho vrátí (ověřeno: stejný prvek před i po) | – |
-| I | U karty zdroje a v hledání svítila v liště nesouvisející karta jako „aktivní“ | pod otevřeným detailem/hledáním není žádná karta aktivní | po |
-| I | Záře fokusu u plakátu obklopovala i text pod ním | obrys jen kolem plakátu | po |
+| I | U karty zdroje a v hledání svítila v liště nesouvisející karta jako „aktivní“ | pod otevřeným detailem/hledáním není žádná karta aktivní | [po](screenshots/1080_search_empty.png) |
+| I | Záře fokusu u plakátu obklopovala i text pod ním | obrys jen kolem plakátu | [po](screenshots/1080_movies_focus.png) |
 | I | Info lišta přehrávače: bez programu se název kanálu opakoval dvakrát; čitelnost nad videem | nahoře číslo + zdroj, scrim silnější | – |
 | I | Radio bez loga: šedá deska, na rádiu se točil spinner přes rádio vrstvu | akcentový kruh s monogramem, spinner jen nad videem | [po](screenshots/1080_radio_player_bars.png) |
-| I | Film s délkou „1 min“ (poskytovatel posílá nesmysl) | délky < 5 min se nezobrazují | po |
+| I | Film s délkou „1 min“ (poskytovatel posílá nesmysl) | délky < 5 min se nezobrazují | [po](screenshots/1080_movie_detail.png) |
 | I | Kompaktní Živě: nadpisy skupin a názvy kanálů příliš zkrácené, počet zmáčknutý vedle názvu | počet pod názvem skupiny, sloupce přerozdělené (204 / střed / 252 dp) | [po](screenshots/1080_live_compact.png) |
 | P | Kontrast drobného textu (`MUTED`) 3,2–4,1:1 | `#8394AA`, ≥ 4,4:1 na všech površích (viz DESIGN_SYSTEM.md) | – |
 | P | Různá zaoblení (12/14/16 dp) u podobných prvků | `R_CTRL 14` pro ovladatelné prvky | – |
@@ -86,3 +86,6 @@ Skóre vychází jen z pozorování popsaných výše (screenshoty 1080p, část
 - Žádný čtečkový nástroj (TalkBack) ani kontrola velkého systémového písma.
 - Poskytovatelé v testu nemají EPG pro většinu kanálů, proto jsou časové osy bez pořadů; vzhled bloků pořadů je ověřen jen v kódu a unit testech geometrie (`TimelineTest`).
 - Výkon vizualizéru jsem neměřil přesně (jen průběžně `top` ~85–90 % jednoho jádra aplikace při přehrávání).
+
+## Minimalistický redesign (v2)
+Po zpětné vazbě („moc velký a moc bloated, spíš minimalistické jako OTT“): měřítko 0,8×, textová horní lišta s podtržením, ploché povrchy bez obrysů, bez lišt s nápovědou, textové čipy, jednodušší hero. Znovu prohlédnuto na zařízení (1080p): Home, Živě, Filmy, Rádio (seznam), Zdroje, Nastavení; screenshoty v `screenshots/1080_*` jsou nové. Detail seriálu, přehrávač a 720p po redesignu znovu neověřeny.

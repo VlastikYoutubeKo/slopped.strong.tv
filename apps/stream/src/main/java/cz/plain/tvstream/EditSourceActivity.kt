@@ -42,6 +42,8 @@ class EditSourceActivity : Activity() {
     private lateinit var statusMsg: TextView
     private lateinit var primary: TextView
 
+    override fun attachBaseContext(base: android.content.Context) { super.attachBaseContext(UiScale.wrap(base)) }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         Settings.init(this); Library.init(this)

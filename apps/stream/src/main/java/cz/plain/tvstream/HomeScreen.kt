@@ -51,10 +51,10 @@ class HomeScreen(act: MainActivity) : Screen(act) {
         head.addView(sub, LinearLayout.LayoutParams(WRAP_CONTENT, WRAP_CONTENT).apply { topMargin = c.dp(6) })
         content.addView(head)
         run {
-            hero.background = Design.glass(c, Design.R_LG, solid = true); hero.clipToOutline = true
+            hero.background = Design.glass(c, Design.R_LG); hero.clipToOutline = true
             hero.outlineProvider = object : android.view.ViewOutlineProvider() { override fun getOutline(v: View, o: android.graphics.Outline) { o.setRoundRect(0, 0, v.width, v.height, c.dpf(Design.R_LG)) } }
             val row = LinearLayout(c).apply { orientation = LinearLayout.HORIZONTAL }
-            val txt = LinearLayout(c).apply { orientation = LinearLayout.VERTICAL; setPadding(c.dp(Sp.XXL), c.dp(Sp.XL), c.dp(Sp.XXL), c.dp(Sp.XL)); gravity = Gravity.CENTER_VERTICAL }
+            val txt = LinearLayout(c).apply { orientation = LinearLayout.VERTICAL; setPadding(0, c.dp(Sp.XL), c.dp(Sp.XXL), c.dp(Sp.XL)); gravity = Gravity.CENTER_VERTICAL }
             txt.addView(c.caption("POKRAČOVAT VE SLEDOVÁNÍ"))
             txt.addView(heroTitle, LinearLayout.LayoutParams(MATCH_PARENT, WRAP_CONTENT).apply { topMargin = c.dp(Sp.S) })
             txt.addView(heroSub, LinearLayout.LayoutParams(WRAP_CONTENT, WRAP_CONTENT).apply { topMargin = c.dp(6) })
@@ -116,11 +116,9 @@ class HomeScreen(act: MainActivity) : Screen(act) {
             if (!h.poster.isNullOrEmpty()) Logos.load(h.poster, heroImage, client, 640) {
                 heroImage.scaleType = android.widget.ImageView.ScaleType.CENTER_CROP; heroImage.setPadding(0, 0, 0, 0); heroImage.clearColorFilter(); heroImage.background = null; heroScrim.visibility = View.VISIBLE
             } else heroImage.setImageDrawable(null)
+            // Minimalisticky: bez plakátu je banner jen text, bez náhradní ikony.
             heroScrim.visibility = View.GONE
-            heroImage.scaleType = android.widget.ImageView.ScaleType.CENTER_INSIDE; heroImage.setPadding(c.dp(140), c.dp(50), c.dp(140), c.dp(50))
-            heroImage.setImageResource(if (h.key.startsWith("ep:")) R.drawable.ic_series else R.drawable.ic_movie)
-            heroImage.setColorFilter(Design.withAlpha(Design.accent, 0.55f))
-            heroImage.background = android.graphics.drawable.GradientDrawable(android.graphics.drawable.GradientDrawable.Orientation.LEFT_RIGHT, intArrayOf(Design.withAlpha(Design.accent, 0.0f), Design.withAlpha(Design.accent, 0.22f)))
+            heroImage.setImageDrawable(null); heroImage.background = null; heroImage.clearColorFilter()
         }
         cont.submit(conts.drop(if (heroItem != null) 1 else 0))
         val recentItems = UserData.recent().mapNotNull { Library.find(it.key) }.take(20)

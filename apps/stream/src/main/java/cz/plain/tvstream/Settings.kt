@@ -5,6 +5,8 @@ import android.content.SharedPreferences
 
 /** Uživatelská nastavení (jedno místo pravdy). Hodnoty se čtou při každém použití, takže změna platí hned. */
 object Settings {
+    const val DEFAULT_SCALE = 0.8f
+
     private lateinit var sp: SharedPreferences
 
     fun init(ctx: Context) {
@@ -17,6 +19,8 @@ object Settings {
     private fun i(k: String, d: Int) = sp.getInt(k, d)
 
     // Vzhled
+    /** Velikost rozhraní: násobek hustoty obrazovky (0,8 odpovídá obvyklým 240 dpi televizí; box hlásí 320 dpi, takže vše bylo o třetinu větší). */
+    var uiScale: Float get() = sp.getFloat("uiScale", DEFAULT_SCALE); set(v) = sp.edit().putFloat("uiScale", v).apply()
     var accentIndex: Int get() = i("accent", 0); set(v) = sp.edit().putInt("accent", v).apply()
     var reducedMotion: Boolean get() = b("reducedMotion", false); set(v) = sp.edit().putBoolean("reducedMotion", v).apply()
     var highContrast: Boolean get() = b("highContrast", false); set(v) = sp.edit().putBoolean("highContrast", v).apply()

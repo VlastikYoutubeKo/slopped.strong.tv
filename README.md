@@ -10,10 +10,9 @@ Odtučnění, měření a vlastní aplikace pro **Strong 4K Google TV box** (mod
 | [`apps/`](apps) | tři vlastní aplikace pro Android TV: **TV Nástroje**, **Odjezdy TV**, **TV Stream** |
 
 <p>
-  <img src="apps/docs/screenshots/1080_home_focus-hero.png" width="49%" alt="Domů">
-  <img src="apps/docs/screenshots/1080_live_compact.png" width="49%" alt="Živé vysílání">
   <img src="apps/docs/screenshots/1080_radio_player_orb.png" width="49%" alt="Rádio s vizualizérem">
   <img src="apps/docs/screenshots/1080_settings.png" width="49%" alt="Nastavení">
+  <img src="apps/docs/screenshots/1080_dialog_settings-accent.png" width="49%" alt="Barva akcentu">
 </p>
 
 ## 1) Debloat a optimalizace boxu (`debloat/`)
@@ -44,7 +43,7 @@ Jeden Gradle projekt (AGP 9, Kotlin, bez Compose, ovládání D-padem).
 | `stream` | **TV Stream** | přehrávač IPTV zdrojů: **Xtream Codes**, **TVHeadend** (Basic/Digest, nahrávky), **Stalker / Ministra** (MAC portály) |
 
 **TV Stream** je jen přehrávač: žádný obsah neposkytuje a žádný nevolí. Používej ho **jen se zdroji, ke kterým máš oprávnění** (vlastní TVHeadend, vlastní Ministra, předplatné u poskytovatele).
-Umí: živé TV s programem (kompaktní průvodce i časová osa), filmy a seriály s pokračováním, rádio s vizualizérem podle skutečného zvuku a ICY/ID3 metadaty, oblíbené, hledání, nastavení zdrojů z telefonu (QR + PIN), více zdrojů najednou, 60 000+ kanálů plynule.
+Design je minimalistický, bez zbytečných prvků (v Nastavení jde změnit velikost rozhraní). Umí: živé TV s programem (kompaktní průvodce i časová osa), filmy a seriály s pokračováním, rádio s vizualizérem podle skutečného zvuku a ICY/ID3 metadaty, oblíbené, hledání, nastavení zdrojů z telefonu (QR + PIN), více zdrojů najednou, 60 000+ kanálů plynule.
 Hesla jsou šifrovaná klíčem v Android Keystore, v logu ani v cache zdrojů nejsou.
 
 ### Build

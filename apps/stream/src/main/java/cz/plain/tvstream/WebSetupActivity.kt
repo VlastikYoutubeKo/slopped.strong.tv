@@ -33,6 +33,8 @@ class WebSetupActivity : Activity() {
     private lateinit var log: LinearLayout
     private val events = ArrayDeque<String>()
 
+    override fun attachBaseContext(base: android.content.Context) { super.attachBaseContext(UiScale.wrap(base)) }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         Settings.init(this); Library.init(this)

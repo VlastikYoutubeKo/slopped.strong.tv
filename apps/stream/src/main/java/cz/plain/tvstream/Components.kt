@@ -286,7 +286,7 @@ open class ListRow(ctx: Context, heightDp: Int = 0, padV: Int = Sp.S) : LinearLa
         column.addView(barView, LayoutParams(MATCH_PARENT, ctx.dp(3)).apply { topMargin = ctx.dp(6) })
         addView(column, LayoutParams(0, WRAP_CONTENT, 1f).apply { marginStart = ctx.dp(Sp.M) })
         addView(badgeView, LayoutParams(WRAP_CONTENT, WRAP_CONTENT).apply { marginStart = ctx.dp(Sp.S) })
-        layoutParams = RecyclerView.LayoutParams(MATCH_PARENT, if (heightDp > 0) ctx.dp(heightDp) else WRAP_CONTENT).apply { bottomMargin = ctx.dp(Sp.S) }
+        layoutParams = RecyclerView.LayoutParams(MATCH_PARENT, if (heightDp > 0) ctx.dp(heightDp) else WRAP_CONTENT).apply { bottomMargin = ctx.dp(Sp.XS) }
         Design.focusable(this, Design.R_CTRL, Design.SCALE_ROW)
     }
 

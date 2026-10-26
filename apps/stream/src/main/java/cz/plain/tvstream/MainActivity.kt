@@ -67,13 +67,15 @@ class MainActivity : Activity() {
 
     private val tick = object : Runnable { override fun run() { clock.text = hhmm(System.currentTimeMillis()); main.postDelayed(this, 20_000) } }
 
+    override fun attachBaseContext(base: android.content.Context) { super.attachBaseContext(UiScale.wrap(base)) }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         Settings.init(this); UserData.init(this); Library.init(this); Playback.init(this)
 
         frame = FrameLayout(this).apply { background = AmbientBackground() }
         val column = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL }
-        column.addView(buildBar(), LinearLayout.LayoutParams(MATCH_PARENT, dp(76)))
+        column.addView(buildBar(), LinearLayout.LayoutParams(MATCH_PARENT, dp(64)))
         content = FrameLayout(this).apply { clipChildren = false; clipToPadding = false }
         column.addView(content, LinearLayout.LayoutParams(MATCH_PARENT, 0, 1f))
         frame.addView(column, FrameLayout.LayoutParams(MATCH_PARENT, MATCH_PARENT))
@@ -132,11 +134,7 @@ class MainActivity : Activity() {
     private fun buildBar(): View {
         val bar = LinearLayout(this).apply { orientation = LinearLayout.HORIZONTAL; gravity = Gravity.CENTER_VERTICAL; setPadding(dp(Sp.XXXL), dp(Sp.S), dp(Sp.XXXL), dp(Sp.S)); clipChildren = false; clipToPadding = false }
         // značka aplikace
-        val mark = label(Typo.LABEL, Design.TEXT, 600).also { brand = it }.apply {
-            text = "TV Stream"; compoundDrawablePadding = dp(10)
-            setCompoundDrawablesRelativeWithIntrinsicBounds(R.drawable.ic_tv_w, 0, 0, 0)
-            compoundDrawableTintList = android.content.res.ColorStateList.valueOf(Design.accent)
-        }
+        val mark = label(Typo.LABEL, Design.accent, 700).also { brand = it }.apply { text = "TV Stream"; letterSpacing = 0.02f }
         bar.addView(mark)
         bar.addView(View(this), LinearLayout.LayoutParams(dp(36), 1))
         tabRow = LinearLayout(this).apply { orientation = LinearLayout.HORIZONTAL; gravity = Gravity.CENTER_VERTICAL; clipChildren = false; clipToPadding = false }
@@ -147,16 +145,16 @@ class MainActivity : Activity() {
             visibility = View.GONE; setPadding(dp(Sp.L), 0, dp(Sp.L), 0); gravity = Gravity.CENTER_VERTICAL; maxWidth = dp(190)
             compoundDrawablePadding = dp(Sp.S); setCompoundDrawablesRelativeWithIntrinsicBounds(R.drawable.ic_volume, 0, 0, 0)
             compoundDrawableTintList = android.content.res.ColorStateList.valueOf(Design.accent)
-            background = Design.glass(this@MainActivity, Design.R_CTRL); Design.focusable(this, Design.R_CTRL, Design.SCALE_CARD)
+            background = TabDrawable(this@MainActivity); Design.focusable(this, Design.R_CTRL, Design.SCALE_FIELD)
             setOnClickListener { startActivity(Intent(this@MainActivity, PlayerActivity::class.java)) }
         }
         bar.addView(miniPlayer, LinearLayout.LayoutParams(WRAP_CONTENT, dp(46)).apply { marginEnd = dp(14) })
         val search = icon(R.drawable.ic_search, 22, Design.TEXT2).apply {
-            setPadding(dp(11), dp(11), dp(11), dp(11)); background = Design.glass(this@MainActivity, Design.R_CTRL)
+            setPadding(dp(11), dp(11), dp(11), dp(11)); background = TabDrawable(this@MainActivity)
             Design.focusable(this, Design.R_CTRL); setOnClickListener { push(SearchScreen(this@MainActivity)) }
             describe("Hledat")
         }
-        bar.addView(search, LinearLayout.LayoutParams(dp(46), dp(46)).apply { marginEnd = dp(Sp.L) })
+        bar.addView(search, LinearLayout.LayoutParams(dp(40), dp(40)).apply { marginEnd = dp(Sp.L) })
         clock = label(Typo.TITLE, Design.TEXT, 500, mono = true)
         bar.addView(clock)
         return bar
@@ -172,7 +170,7 @@ class MainActivity : Activity() {
             for (t in visible) {
                 val v = t.view ?: makeTab(t).also { t.view = it }
                 (v.parent as? ViewGroup)?.removeView(v)
-                tabRow.addView(v, LinearLayout.LayoutParams(WRAP_CONTENT, dp(46)).apply { marginEnd = dp(Sp.XS) })
+                tabRow.addView(v, LinearLayout.LayoutParams(WRAP_CONTENT, dp(40)).apply { marginEnd = dp(Sp.XS) })
             }
             shownTabs = ids
             hadFocus?.view?.requestFocus()
@@ -186,17 +184,17 @@ class MainActivity : Activity() {
     }
 
     private fun makeTab(t: Tab): LinearLayout {
-        val ic = icon(t.icon, 22, Design.TEXT2)
-        val tx = label(Typo.BODY, Design.TEXT, 500).apply { visibility = View.GONE; setPadding(dp(Sp.S), 0, 0, 0) }
-        t.ic = ic; t.text = tx
+        // Jen text: aktivní karta je zvýrazněná a podtržená, zaostřená má jemné pozadí.
+        val tx = label(Typo.BODY, Design.TEXT2, 500).apply { text = t.label }
+        t.text = tx; t.ic = null
         val v = LinearLayout(this)
         v.apply {
-            orientation = LinearLayout.HORIZONTAL; gravity = Gravity.CENTER; setPadding(dp(Sp.M), 0, dp(Sp.M), 0)
-            background = Design.glass(this@MainActivity, Design.R_CTRL)
-            addView(ic); addView(tx); tx.text = t.label
+            orientation = LinearLayout.HORIZONTAL; gravity = Gravity.CENTER; setPadding(dp(Sp.L), 0, dp(Sp.L), 0)
+            background = TabDrawable(this@MainActivity)
+            addView(tx)
             describe(t.label)
             // Fokus na kartu přepne obsah (s krátkou prodlevou, ať rychlé procházení kartami nestaví obrazovky).
-            Design.focusable(this, Design.R_CTRL, Design.SCALE_CARD) { f ->
+            Design.focusable(this, Design.R_CTRL, Design.SCALE_FIELD) { f ->
                 styleTab(t, f)
                 if (f) {
                     switchRunnable?.let { main.removeCallbacks(it) }
@@ -215,9 +213,8 @@ class MainActivity : Activity() {
         val active = t.id == current && stack.isEmpty()
         t.view?.isActivated = active
         t.view?.describe(t.label, selected = active)
-        t.text?.visibility = if (active || focused) View.VISIBLE else View.GONE
-        t.text?.setTextColor(if (active) Design.TEXT else Design.TEXT2)
-        t.ic?.setColorFilter(if (active) Design.accent else if (focused) Design.TEXT else Design.TEXT2)
+        t.text?.setTextColor(if (active || focused) Design.TEXT else Design.TEXT2)
+        t.text?.typeface = Design.ui(this, if (active) 600 else 500)
     }
 
     /** Otevře Živě omezené na jeden zdroj. */
@@ -358,4 +355,36 @@ class MainActivity : Activity() {
             else -> tabs.firstOrNull { it.id == current }?.view?.requestFocus()   // z obsahu zpět na horní lištu
         }
     }
+}
+
+/** Podklad karty v horní liště: v klidu nic, aktivní karta je podtržená akcentem, zaostřená má jemné pozadí a akcentový rámeček. */
+class TabDrawable(ctx: android.content.Context) : android.graphics.drawable.Drawable() {
+    private val d = ctx.resources.displayMetrics.density
+    private val fill = android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG)
+    private val line = android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG).apply { style = android.graphics.Paint.Style.STROKE }
+    private val rect = android.graphics.RectF()
+    private var focused = false
+    private var active = false
+    override fun isStateful() = true
+    override fun onStateChange(state: IntArray): Boolean {
+        var f = false; var a = false
+        for (s in state) when (s) { android.R.attr.state_focused -> f = true; android.R.attr.state_activated, android.R.attr.state_selected -> a = true }
+        if (f == focused && a == active) return false
+        focused = f; active = a; invalidateSelf(); return true
+    }
+    override fun draw(c: android.graphics.Canvas) {
+        val r = Design.R_CTRL * d
+        if (focused) {
+            fill.color = 0xFF1E2438.toInt()
+            rect.set(bounds); rect.inset(d, d); c.drawRoundRect(rect, r, r, fill)
+            line.color = Design.accent; line.strokeWidth = 2f * d; rect.set(bounds); rect.inset(d, d); c.drawRoundRect(rect, r, r, line)
+        } else if (active) {
+            fill.color = Design.accent
+            val w = bounds.width() * 0.34f
+            c.drawRoundRect(bounds.exactCenterX() - w / 2, bounds.bottom - 5 * d, bounds.exactCenterX() + w / 2, bounds.bottom - 2.5f * d, 2 * d, 2 * d, fill)
+        }
+    }
+    override fun setAlpha(alpha: Int) {}
+    override fun setColorFilter(cf: android.graphics.ColorFilter?) {}
+    @Deprecated("Deprecated in Java") override fun getOpacity() = android.graphics.PixelFormat.TRANSLUCENT
 }

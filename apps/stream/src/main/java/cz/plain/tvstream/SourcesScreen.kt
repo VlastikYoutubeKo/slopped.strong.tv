@@ -41,7 +41,6 @@ class SourcesScreen(act: MainActivity) : Screen(act) {
             setPadding(c.dp(Sp.XXXL), c.dp(10), c.dp(Sp.XXXL), 0); setLineSpacing(0f, 1.2f)
         })
         box.addView(c.spacer())
-        box.addView(c.hintBar("OK" to "Otevřít", "Podržet OK" to "Správa zdroje", "◀ ▶" to "Procházet"), LinearLayout.LayoutParams(MATCH_PARENT, WRAP_CONTENT).apply { setMargins(c.dp(Sp.XXXL), 0, c.dp(Sp.XXXL), c.dp(18)) })
     }
 
     override fun onShow() = reload()

@@ -64,6 +64,8 @@ class PlayerActivity : Activity() {
     private val dimRun = Runnable { setDim(true) }
     private val shiftRun = object : Runnable { override fun run() { radio.shiftRandom(); main.postDelayed(this, 60_000) } }
 
+    override fun attachBaseContext(base: android.content.Context) { super.attachBaseContext(UiScale.wrap(base)) }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)

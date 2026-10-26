@@ -9,7 +9,7 @@ Obrazovky nemají vlastní barvy, velikosti písma ani zvětšení při fokusu; 
 | Token | Hodnota | Použití |
 |---|---|---|
 | `BG` / `ELEVATED` | `#0B0D14` / `#101420` | pozadí, vyvýšené plochy |
-| `SURFACE` | `#161A26` při 30 % | skleněné povrchy |
+| `SURFACE` | `#161A26` při 16 % | ploché skleněné povrchy bez obrysu (minimalistický styl) |
 | `SURFACE_SOLID` | `#141826` | velké textové plochy a dialogy (průhlednost zhoršuje čitelnost) |
 | `FOCUS_SURFACE` | `#262C40` při 60 % | povrch při fokusu (průhledné prvky) |
 | `TEXT` / `TEXT2` / `MUTED` | `#F8FAFC` / `#94A3B8` / `#8394AA` | text. Kontrast ≥ 4,4:1 i na `FOCUS_SURFACE` (MUTED dřív `#64748B` = 3,2:1) |
@@ -84,3 +84,12 @@ Obnovení fokusu: seznamy se při změně dat aktualizují na místě (`SimpleAd
 2. Vnitřní rozměry komponenty (výška, šířka sloupce, velikost náhledu) – ne rozestupy mezi komponentami.
 3. Barva mimo tokeny jen s důvodem v komentáři u kódu; nové barvy se přidávají do `Design.kt`.
 4. Jiné zvětšení při fokusu jen u prvků, které nejsou ve sloupci s jinými (tlačítko v hero banneru má `SCALE_CARD`).
+
+## Minimalistický styl (v2, OTT)
+Reakce na „moc velké a moc bloated“: méně prvků, menší měřítko, ploché povrchy.
+- **Měřítko rozhraní** (UiScale, Nastavení → Velikost rozhraní): výchozí je Střední (0,8× dp); Velké vrací původní velikost. Implementováno přes densityDpi obalu kontextu, takže všechny dp tokeny zůstávají beze změn.
+- **Horní lišta**: jen text (logo, záložky, hledání, hodiny); aktivní záložka má tenké akcentové podtržení (TabDrawable), ne kartu.
+- **Povrchy**: bez obrysů v klidu; obrys a záře jen při fokusu. Řádky nemají pozadí, panely jsou ploché.
+- **Bez lišt s nápovědou ovládání** a bez ozdob; čipy a filtry jsou jen text.
+- **Home hero**: jen text (titul, popis, tlačítko), plakát jen když existuje.
+- Výška řádku kanálu 60 dp, lišta 64 dp.
