@@ -63,6 +63,7 @@ class LiveScreen(act: MainActivity, private val kind: ChannelKind) : Screen(act)
     private val hintsTimeline = act.hintBar("OK" to "Přehrát", "Podržet OK" to "Možnosti", "◀▶" to "Pořad", "▲▼" to "Kanál", "Zpět" to "Nahoru")
     private val sortChip: TextView
     private val filterChip: TextView
+    private val sourceChip: TextView
     private val queryChip: TextView
     private val modeChip: TextView
     private val groupChip: TextView
@@ -104,10 +105,11 @@ class LiveScreen(act: MainActivity, private val kind: ChannelKind) : Screen(act)
         sortChip = c.chip("", R.drawable.ic_sort) { sortMenu() }
         filterChip = c.chip("Filtry", R.drawable.ic_equalizer) { filterMenu() }
         queryChip = c.chip("Hledat", R.drawable.ic_search) { searchPrompt() }
+        sourceChip = c.chip("Zdroj", R.drawable.ic_source) { sourceMenu() }
         modeChip = c.chip("", R.drawable.ic_grid) { toggleMode() }
         groupChip = c.chip("", R.drawable.ic_list) { groupMenu() }
         timeline = TimelineView(act, { item, _ -> Actions.playLive(act, item, visible) }, { it2 -> Actions.channelMenu(act, it2) { adapter.notifyDataSetChanged(); timeline.refresh(); recomputeRailCounts() } })
-        listOf(groupChip, modeChip, queryChip, filterChip, sortChip).forEach { head.addView(it, LinearLayout.LayoutParams(WRAP_CONTENT, c.dp(42)).apply { marginStart = c.dp(10) }) }
+        listOf(groupChip, modeChip, sourceChip, queryChip, filterChip, sortChip).forEach { head.addView(it, LinearLayout.LayoutParams(WRAP_CONTENT, c.dp(42)).apply { marginStart = c.dp(10) }) }
         col.addView(head)
 
         // tělo: skupiny | seznam | detail
@@ -210,7 +212,8 @@ class LiveScreen(act: MainActivity, private val kind: ChannelKind) : Screen(act)
             val all = Library.items().filter { it.kind == kind }
             val multi = Library.sources().size > 1
             // rail: počty za skupiny (jednou za verzi knihovny, jinak se jen znovu filtruje)
-            val entries = buildRail(all, multi)
+            val scoped = if (f.sources.isEmpty()) all else all.filter { it.src.id in f.sources }
+            val entries = buildRail(scoped, multi && f.sources.size != 1, f.sources)
             val idx = entries.indexOfFirst { it.id == railId }.let { if (it < 0) 0 else it }
             var list = all.asSequence().filter(entries[idx].test)
             if (f.quality.isNotEmpty()) list = list.filter { it.ch.quality in f.quality }
@@ -233,7 +236,7 @@ class LiveScreen(act: MainActivity, private val kind: ChannelKind) : Screen(act)
         }
     }
 
-    private fun buildRail(all: List<LiveItem>, multi: Boolean): List<RailEntry> {
+    private fun buildRail(all: List<LiveItem>, multi: Boolean, only: Set<String>): List<RailEntry> {
         val counts = HashMap<String, Int>()
         var fav = 0; var recent = 0
         val recentKeys = UserData.recent(if (isRadio) "radio" else "live").map { it.key }.toHashSet()
@@ -246,7 +249,7 @@ class LiveScreen(act: MainActivity, private val kind: ChannelKind) : Screen(act)
         out += RailEntry("all", if (isRadio) "Všechny stanice" else "Všechny kanály", null, all.size) { true }
         out += RailEntry("fav", "Oblíbené", null, fav) { it.favorite }
         out += RailEntry("recent", "Naposledy sledované", null, recent) { it.key in recentKeys }
-        for (src in Library.sources()) for (cat in Library.categories(src)) {
+        for (src in Library.sources().filter { only.isEmpty() || it.id in only }) for (cat in Library.categories(src)) {
             val n = counts["${src.id}|${cat.id}"] ?: 0
             if (n == 0) continue
             val sid = src.id; val cid = cat.id
@@ -339,6 +342,10 @@ class LiveScreen(act: MainActivity, private val kind: ChannelKind) : Screen(act)
 
     private fun updateChips() {
         sortChip.text = sort.label
+        val srcs = Library.sources()
+        sourceChip.visibility = if (srcs.size > 1) View.VISIBLE else View.GONE
+        sourceChip.text = when (filters.sources.size) { 0 -> "Všechny zdroje"; 1 -> srcs.firstOrNull { it.id in filters.sources }?.name ?: "Zdroj"; else -> "Zdroje (${filters.sources.size})" }
+        sourceChip.setTextColor(if (filters.sources.isEmpty()) Design.TEXT else Design.accent)
         modeChip.text = if (mode == "timeline") "Časová osa" else "Kompaktní"
         groupChip.text = rail.getOrNull(railIndex)?.label ?: "Všechny"
         groupChip.visibility = if (mode == "timeline") View.VISIBLE else View.GONE
@@ -354,6 +361,20 @@ class LiveScreen(act: MainActivity, private val kind: ChannelKind) : Screen(act)
             updateChips(); recompute(false)
         }
     })
+
+    /** Rychlé přepnutí zdroje: jeden zdroj, nebo všechny. Kombinace více zdrojů zůstává ve Filtrech. */
+    private fun sourceMenu() {
+        val counts = Library.items().filter { it.kind == kind }.groupingBy { it.src.id }.eachCount()
+        val e = ArrayList<MenuEntry>()
+        e += MenuEntry("Všechny zdroje", if (filters.sources.isEmpty()) R.drawable.ic_check else 0, detail = fmtCount(counts.values.sum()), selected = filters.sources.isEmpty()) { setSources(emptySet()) }
+        Library.sources().forEach { s ->
+            val on = filters.sources == setOf(s.id)
+            e += MenuEntry(s.name, if (on) R.drawable.ic_check else 0, detail = fmtCount(counts[s.id] ?: 0), selected = on) { setSources(setOf(s.id)) }
+        }
+        act.showMenu("Zdroj", null, e)
+    }
+
+    private fun setSources(ids: Set<String>) { filters = filters.copy(sources = ids); railIndex = 0; updateChips(); recompute(false) }
 
     private fun searchPrompt() = act.askText(if (isRadio) "Hledat stanici" else "Hledat kanál", "Název kanálu", query) { q -> query = q; updateChips(); recompute(false) }
 
